@@ -2,6 +2,7 @@
   "name": "3d-card-slider",
   "version": "1.0.0",
   "private": true,
+  "homepage": "https://talex210.github.io/3D-slider/",
   "dependencies": {
     "@types/node": "^18.19.0",
     "@types/react": "^18.2.79",
@@ -11,11 +12,16 @@
     "react-scripts": "5.0.1",
     "typescript": "^4.9.5"
   },
+  "devDependencies": {
+    "gh-pages": "^6.3.0"
+  },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
   },
   "eslintConfig": {
     "extends": [
