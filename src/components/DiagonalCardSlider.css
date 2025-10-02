@@ -21,6 +21,12 @@
   height: 100%;
   position: relative;
   transform-style: preserve-3d;
+  pointer-events: none;
+}
+
+/* Карточки должны получать события мыши */
+.diagonal-slider-scene .diagonal-card {
+  pointer-events: auto;
 }
 
 /* Диагональная карточка */
@@ -29,10 +35,19 @@
   width: 300px;
   height: 400px;
   transform-style: preserve-3d;
-  transition: transform 0.3s ease;
+  transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   will-change: transform;
   transform-origin: center center;
+  cursor: pointer;
+  pointer-events: auto;
 }
+
+/* Обеспечиваем правильную работу hover для всех карточек */
+.diagonal-card:hover {
+  z-index: 9999 !important;
+}
+
+
 
 .diagonal-card img {
   width: 100%;
@@ -48,23 +63,8 @@
   pointer-events: none;
 }
 
-/* Тень карточки */
 .card-shadow {
-  position: absolute;
-  bottom: -50px;
-  left: 20px;
-  right: 20px;
-  height: 30px;
-  background: radial-gradient(
-    ellipse at center,
-    rgba(0, 0, 0, 0.4) 0%,
-    rgba(0, 0, 0, 0.2) 50%,
-    transparent 100%
-  );
-  border-radius: 50%;
-  filter: blur(15px);
-  transform: rotateX(90deg) translateZ(-15px);
-  transform-origin: center;
+  display: none;
 }
 
 /* Эффект парения и боковая грань */
@@ -85,8 +85,6 @@
   border-radius: 15px;
   pointer-events: none;
 }
-
-
 
 /* Убираем выделение текста */
 .diagonal-slider-container * {
@@ -145,4 +143,134 @@
   );
   pointer-events: none;
   z-index: 2;
+}
+
+/* Область описания карточки */
+.card-description {
+  position: absolute;
+  top: 40px;
+  left: 40px;
+  width: 350px;
+  max-height: 150px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  border-radius: 20px;
+  padding: 25px;
+  box-shadow: 
+    0 20px 40px rgba(0, 0, 0, 0.15),
+    0 10px 20px rgba(0, 0, 0, 0.1);
+  opacity: 0;
+  transform: translateY(-20px);
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  pointer-events: none;
+  z-index: 10000;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.card-description.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.card-category {
+  margin: 0 0 10px 0;
+  font-size: 14px;
+  font-weight: 500;
+  color: #718096;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.card-title {
+  margin: 0 0 15px 0;
+  font-size: 24px;
+  font-weight: 700;
+  color: #2d3748;
+  line-height: 1.2;
+}
+
+.card-text {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.5;
+  color: #4a5568;
+  font-weight: 400;
+}
+
+/* Заголовок на карточке - сверху */
+.card-title-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.1) 0%,
+    rgba(255, 255, 255, 0.05) 50%,
+    transparent 100%
+  );
+  padding: 20px;
+  border-radius: 15px 15px 0 0;
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
+.card-title-text {
+  display: block;
+  color: #2d3748;
+  font-size: 16px;
+  font-weight: 600;
+  text-align: left;
+  text-shadow: 0 2px 4px rgba(255, 255, 255, 0.8);
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  line-height: 1.3;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+/* Hover эффект - появление заголовка и инверсия цвета */
+.diagonal-card.hovered .card-title-overlay {
+  opacity: 1;
+  transform: translateY(0);
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.95) 0%,
+    rgba(255, 255, 255, 0.8) 50%,
+    transparent 100%
+  );
+}
+
+.diagonal-card.hovered .card-title-text {
+  color: #2d3748;
+  text-shadow: 0 2px 4px rgba(255, 255, 255, 0.8);
+}
+
+/* Hover на текст - инверсия цвета */
+.card-title-text:hover {
+  color: white !important;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.7) !important;
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  padding: 4px 8px;
+}
+
+/* Футер слайдера */
+.slider-footer {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1001;
+  pointer-events: none;
+}
+
+.footer-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.9);
+  text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  letter-spacing: 2px;
+  text-transform: uppercase;
 }

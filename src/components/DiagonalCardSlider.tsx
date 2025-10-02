@@ -5,24 +5,70 @@ interface CardData {
   id: number;
   src: string;
   alt: string;
+  title: string;
+  description: string;
 }
 
 const DiagonalCardSlider: React.FC = () => {
   const [offset, setOffset] = useState<number>(0);
+  const [hoveredCard, setHoveredCard] = useState<CardData | null>(null);
+  const [hoveredPosition, setHoveredPosition] = useState<number | null>(null);
   const sliderRef = useRef<HTMLDivElement>(null);
   const isDragging = useRef<boolean>(false);
   const startX = useRef<number>(0);
   const startOffset = useRef<number>(0);
 
-  // Список изображений (дублируем для бесконечности)
+  // Список изображений с описаниями IT-проектов
   const originalCards: CardData[] = [
-    { id: 1, src: '/imgCard/4182c3a36ae0287e74f45e4bc4b0478087395003.png', alt: 'Card 1' },
-    { id: 2, src: '/imgCard/59ba5cf45380257ee8e166783aea5b97c3ea0cdc.png', alt: 'Card 2' },
-    { id: 3, src: '/imgCard/7a09640693403a43979b9a4739084f32d370db3c.png', alt: 'Card 3' },
-    { id: 4, src: '/imgCard/917b42be1295ce1f172cb33877e54f1dec65e57f.png', alt: 'Card 4' },
-    { id: 5, src: '/imgCard/a45850229f15ef811703228f465820f420082051.png', alt: 'Card 5' },
-    { id: 6, src: '/imgCard/ba47b00bf8270ce37d877ac1a7145dc748420631.png', alt: 'Card 6' },
-    { id: 7, src: '/imgCard/d2e3ad2a21dceaaeafc305c81f44cd9f06b16da3.png', alt: 'Card 7' }
+    { 
+      id: 1, 
+      src: '/imgCard/4182c3a36ae0287e74f45e4bc4b0478087395003.png', 
+      alt: 'Telegram Mini App',
+      title: 'Telegram Mini App для администрирования каналов',
+      description: 'Разработка полнофункционального Telegram mini app для управления и администрирования Telegram-каналов с интуитивным интерфейсом и расширенными возможностями модерации.'
+    },
+    { 
+      id: 2, 
+      src: '/imgCard/59ba5cf45380257ee8e166783aea5b97c3ea0cdc.png', 
+      alt: 'HR-сервис',
+      title: 'HR-сервис для подбора специалистов',
+      description: 'Комплексная платформа для автоматизации процессов подбора персонала с AI-алгоритмами сопоставления кандидатов, системой интервью и аналитикой эффективности найма.'
+    },
+    { 
+      id: 3, 
+      src: '/imgCard/7a09640693403a43979b9a4739084f32d370db3c.png', 
+      alt: 'E-commerce платформа',
+      title: 'E-commerce платформа с микросервисной архитектурой',
+      description: 'Масштабируемое решение для интернет-торговли с микросервисной архитектурой, интеграцией платежных систем и системой управления складскими запасами.'
+    },
+    { 
+      id: 4, 
+      src: '/imgCard/917b42be1295ce1f172cb33877e54f1dec65e57f.png', 
+      alt: 'Мобильное приложение',
+      title: 'Мобильное приложение для фитнес-трекинга',
+      description: 'Кроссплатформенное мобильное приложение с интеграцией носимых устройств, персональными тренировками и социальными функциями для мотивации пользователей.'
+    },
+    { 
+      id: 5, 
+      src: '/imgCard/a45850229f15ef811703228f465820f420082051.png', 
+      alt: 'CRM система',
+      title: 'CRM система для управления клиентами',
+      description: 'Современная CRM-система с автоматизацией продаж, аналитикой клиентского пути, интеграцией с внешними сервисами и мобильным приложением для менеджеров.'
+    },
+    { 
+      id: 6, 
+      src: '/imgCard/ba47b00bf8270ce37d877ac1a7145dc748420631.png', 
+      alt: 'Блокчейн платформа',
+      title: 'Блокчейн платформа для NFT маркетплейса',
+      description: 'Децентрализованная платформа для создания, торговли и управления NFT с поддержкой множественных блокчейнов и интегрированным кошельком.'
+    },
+    { 
+      id: 7, 
+      src: '/imgCard/d2e3ad2a21dceaaeafc305c81f44cd9f06b16da3.png', 
+      alt: 'IoT платформа',
+      title: 'IoT платформа для умного дома',
+      description: 'Комплексное решение для управления устройствами умного дома с машинным обучением, голосовым управлением и мобильным приложением для удаленного контроля.'
+    }
   ];
 
   const cardSpacing = 200; // расстояние между карточками по диагонали
@@ -57,8 +103,6 @@ const DiagonalCardSlider: React.FC = () => {
     setOffset(prev => prev + delta);
   }, []);
 
-
-
   // Добавляем глобальные обработчики мыши
   useEffect(() => {
     document.addEventListener('mousemove', handleMouseMove);
@@ -74,10 +118,22 @@ const DiagonalCardSlider: React.FC = () => {
     <div
       className="diagonal-slider-container"
       ref={sliderRef}
-      onMouseDown={handleMouseDown}
       onWheel={handleWheel}
+      onMouseDown={handleMouseDown}
     >
-      <div className="diagonal-slider-scene">
+      {/* Область описания карточки */}
+      <div className={`card-description ${hoveredCard ? 'visible' : ''}`}>
+        {hoveredCard && (
+          <>
+            <div className="card-category">Fintech</div>
+            <h3 className="card-title">{hoveredCard.title}</h3>
+          </>
+        )}
+      </div>
+
+      <div 
+        className="diagonal-slider-scene"
+      >
         {(() => {
           const visibleCards = [];
 
@@ -96,42 +152,71 @@ const DiagonalCardSlider: React.FC = () => {
           const startPosition = Math.floor((startScreenX - diagonalStartX - offset) / cardSpacing) - 1;
           const endPosition = Math.ceil((endScreenX - diagonalStartX - offset) / cardSpacing) + 1;
 
-          // Рендерим только нужные карточки
+          // Создаем массив позиций и сортируем для правильного наложения
+          const positions = [];
           for (let position = startPosition; position <= endPosition; position++) {
+            positions.push(position);
+          }
+          
+          // Сортируем позиции: сначала ближние (меньший position), потом дальние
+          // Это обеспечит правильный порядок в DOM для hover событий
+          positions.sort((a, b) => a - b);
+          
+          // Рендерим карточки в правильном порядке
+          for (const position of positions) {
             // Используем модульную арифметику для бесконечного повторения
             const cardIndex = ((position % totalCards) + totalCards) % totalCards;
             const card = originalCards[cardIndex];
 
-            // Позиция карточки с реальной 3D глубиной для эффекта книжной полки
-            const baseX = position * cardSpacing + offset;
-            const baseY = -(position * cardSpacing * 0.6) - (offset * 0.6);
+            // Правильное диагональное позиционирование - все карточки на одной линии
+            const diagonalOffset = position * cardSpacing + offset;
             
-            // Используем реальную 3D глубину для эффекта книжной полки
-            // Карточки слева (меньшая позиция) находятся ближе к зрителю
-            // Каждая следующая карточка "лежит поверх" предыдущей
-            const baseZ = -position * 5; // Каждая предыдущая позиция на 5px ближе
+            // Диагональ под углом 45 градусов - одинаковое смещение по X и Y
+            const diagonalX = diagonalStartX + diagonalOffset;
+            const diagonalY = diagonalStartY - diagonalOffset * 0.5; // Уменьшаем коэффициент для более пологой диагонали
             
-            const diagonalX = baseX + diagonalStartX;
-            const diagonalY = baseY + diagonalStartY;
-            const diagonalZ = baseZ;
-
-            // Добавляем небольшой поворот для усиления 3D эффекта книжной полки
-            const rotationY = -position * 0.5; // Поворот в обратную сторону для естественного эффекта
+            // 3D глубина для наложения карточек
+            const diagonalZ = -position * 5; // Каждая следующая карточка на 5px дальше
+            
+            // Убираем поворот - карточки должны лежать ровно
+            const rotationY = 0;
+            
+            // Добавляем hover эффект к базовой трансформации
+            // Проверяем и ID карточки, и позицию, чтобы выдвигалась только одна конкретная карточка
+            const isHovered = hoveredCard?.id === card.id && hoveredPosition === position;
+            const hoverOffsetX = isHovered ? 120 : 0;
+            const hoverOffsetY = 0; // Убираем вертикальное движение
+            const hoverOffsetZ = isHovered ? 50 : 0;
+            
+            const finalTransform = `translate3d(${diagonalX + hoverOffsetX}px, ${diagonalY + hoverOffsetY}px, ${diagonalZ + hoverOffsetZ}px) rotateY(${rotationY}deg)`;
             
             visibleCards.push(
               <div
                 key={`card-${position}`}
-                className="diagonal-card"
+                className={`diagonal-card ${isHovered ? 'hovered' : ''}`}
                 style={{
-                  transform: `translate3d(${diagonalX}px, ${diagonalY}px, ${diagonalZ}px) rotateY(${rotationY}deg)`,
-                  opacity: 1
+                  transform: finalTransform,
+                  opacity: 1,
+                  zIndex: isHovered ? 9999 : 1000 + position
                 }}
+                onMouseEnter={() => {
+                  setHoveredCard(card);
+                  setHoveredPosition(position);
+                }}
+                onMouseLeave={() => {
+                  setHoveredCard(null);
+                  setHoveredPosition(null);
+                }}
+                onMouseDown={(e) => e.stopPropagation()}
               >
                 <img
                   src={card.src}
                   alt={card.alt}
                   draggable={false}
                 />
+                <div className="card-title-overlay">
+                  <span className="card-title-text">{card.title}</span>
+                </div>
                 <div className="card-shadow" />
               </div>
             );
@@ -139,6 +224,11 @@ const DiagonalCardSlider: React.FC = () => {
 
           return visibleCards;
         })()}
+      </div>
+      
+      {/* Футер */}
+      <div className="slider-footer">
+        <h2 className="footer-title">Кейсы</h2>
       </div>
     </div>
   );
