@@ -258,3 +258,254 @@
   letter-spacing: 2px;
   text-transform: uppercase;
 }
+
+/* Анимация выбранной карточки */
+.selected-card-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 20000;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.selected-card-overlay.expanding {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.selected-card-overlay.fullscreen {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.selected-card-container {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.selected-card {
+  width: 300px;
+  height: 400px;
+  background-size: cover;
+  background-position: center;
+  border-radius: 15px;
+  position: relative;
+  transition: all 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  box-shadow:
+    0 20px 40px rgba(0, 0, 0, 0.4),
+    0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Анимация расширения карточки */
+.selected-card-overlay.expanding .selected-card {
+  transform: scale(1.2) rotateY(5deg);
+  box-shadow:
+    0 40px 80px rgba(0, 0, 0, 0.6),
+    0 20px 40px rgba(0, 0, 0, 0.4);
+}
+
+/* Полноэкранный режим */
+.selected-card-overlay.fullscreen .selected-card {
+  width: 100vw;
+  height: 100vh;
+  border-radius: 0;
+  transform: scale(1) rotateY(0deg);
+  box-shadow: none;
+}
+
+/* Контент полноэкранного режима */
+.fullscreen-content {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    135deg,
+    rgba(0, 0, 0, 0.7) 0%,
+    rgba(0, 0, 0, 0.4) 50%,
+    rgba(0, 0, 0, 0.7) 100%
+  );
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 80px;
+  color: white;
+  opacity: 0;
+  animation: fadeInContent 0.8s ease 0.4s forwards;
+}
+
+@keyframes fadeInContent {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.back-button {
+  position: absolute;
+  top: 40px;
+  left: 40px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  padding: 12px 24px;
+  border-radius: 30px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.back-button:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.5);
+  transform: translateX(-5px);
+}
+
+.fullscreen-info {
+  max-width: 800px;
+  margin-left: 0;
+}
+
+.fullscreen-category {
+  font-size: 16px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.8);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 20px;
+}
+
+.fullscreen-title {
+  font-size: 48px;
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: 30px;
+  text-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+}
+
+.fullscreen-description {
+  font-size: 20px;
+  line-height: 1.6;
+  margin-bottom: 50px;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.fullscreen-details {
+  display: flex;
+  gap: 60px;
+  flex-wrap: wrap;
+}
+
+.detail-section h3 {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  color: white;
+}
+
+.detail-section p {
+  font-size: 18px;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.8);
+  margin: 0;
+}
+
+.tech-tags {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.tech-tag {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+  backdrop-filter: blur(10px);
+}
+
+/* Скрываем остальные элементы во время анимации */
+.diagonal-slider-container.expanding .card-description,
+.diagonal-slider-container.expanding .slider-footer {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.diagonal-slider-container.fullscreen .card-description,
+.diagonal-slider-container.fullscreen .slider-footer {
+  opacity: 0;
+}
+
+/* Улучшенная анимация карточек */
+.diagonal-card {
+  transition: 
+    transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    opacity 0.3s ease;
+}
+
+/* Стили для выбранной карточки */
+.diagonal-card.selected {
+  z-index: 19999 !important;
+}
+
+/* Плавное появление полноэкранного контента */
+.fullscreen-content {
+  animation-delay: 0.6s;
+}
+
+/* Адаптивность для полноэкранного режима */
+@media (max-width: 1200px) {
+  .fullscreen-content {
+    padding: 60px 40px;
+  }
+  
+  .fullscreen-title {
+    font-size: 36px;
+  }
+  
+  .fullscreen-description {
+    font-size: 18px;
+  }
+  
+  .fullscreen-details {
+    gap: 40px;
+  }
+}
+
+@media (max-width: 768px) {
+  .fullscreen-content {
+    padding: 40px 20px;
+  }
+  
+  .fullscreen-title {
+    font-size: 28px;
+  }
+  
+  .fullscreen-description {
+    font-size: 16px;
+  }
+  
+  .fullscreen-details {
+    flex-direction: column;
+    gap: 30px;
+  }
+}

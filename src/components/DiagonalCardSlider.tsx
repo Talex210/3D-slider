@@ -13,6 +13,10 @@ const DiagonalCardSlider: React.FC = () => {
   const [offset, setOffset] = useState<number>(0);
   const [hoveredCard, setHoveredCard] = useState<CardData | null>(null);
   const [hoveredPosition, setHoveredPosition] = useState<number | null>(null);
+  const [selectedCard, setSelectedCard] = useState<CardData | null>(null);
+  const [selectedPosition, setSelectedPosition] = useState<number | null>(null);
+  const [isExpanding, setIsExpanding] = useState<boolean>(false);
+  const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
   const sliderRef = useRef<HTMLDivElement>(null);
   const isDragging = useRef<boolean>(false);
   const startX = useRef<number>(0);
@@ -76,12 +80,13 @@ const DiagonalCardSlider: React.FC = () => {
 
   // Обработка мыши
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    if (isExpanding || isFullscreen) return; // Блокируем перетаскивание во время анимации
     isDragging.current = true;
     startX.current = e.clientX;
     startOffset.current = offset;
     document.body.style.cursor = 'grabbing';
     e.preventDefault();
-  }, [offset]);
+  }, [offset, isExpanding, isFullscreen]);
 
   const handleMouseMove = useCallback((e: MouseEvent) => {
     if (!isDragging.current) return;
@@ -98,9 +103,37 @@ const DiagonalCardSlider: React.FC = () => {
 
   // Обработка колесика мыши
   const handleWheel = useCallback((e: React.WheelEvent) => {
+    if (isExpanding || isFullscreen) return; // Блокируем прокрутку во время анимации
     e.preventDefault();
     const delta = e.deltaY > 0 ? -50 : 50;
     setOffset(prev => prev + delta);
+  }, [isExpanding, isFullscreen]);
+
+  // Обработка клика по карточке
+  const handleCardClick = useCallback((card: CardData, position: number, e: React.MouseEvent) => {
+    if (isDragging.current || isExpanding || isFullscreen) return;
+    
+    e.stopPropagation();
+    setSelectedCard(card);
+    setSelectedPosition(position);
+    setIsExpanding(true);
+    
+    // Через 0.8 секунд начинаем переход к полноэкранному режиму
+    setTimeout(() => {
+      setIsFullscreen(true);
+    }, 800);
+  }, [isExpanding, isFullscreen]);
+
+  // Функция для возврата к слайдеру
+  const handleBackToSlider = useCallback(() => {
+    setIsFullscreen(false);
+    setIsExpanding(false);
+    
+    // Небольшая задержка перед сбросом выбранной карточки
+    setTimeout(() => {
+      setSelectedCard(null);
+      setSelectedPosition(null);
+    }, 500);
   }, []);
 
   // Добавляем глобальные обработчики мыши
@@ -116,7 +149,7 @@ const DiagonalCardSlider: React.FC = () => {
 
   return (
     <div
-      className="diagonal-slider-container"
+      className={`diagonal-slider-container ${isExpanding ? 'expanding' : ''} ${isFullscreen ? 'fullscreen' : ''}`}
       ref={sliderRef}
       onWheel={handleWheel}
       onMouseDown={handleMouseDown}
@@ -184,30 +217,42 @@ const DiagonalCardSlider: React.FC = () => {
             // Добавляем hover эффект к базовой трансформации
             // Проверяем и ID карточки, и позицию, чтобы выдвигалась только одна конкретная карточка
             const isHovered = hoveredCard?.id === card.id && hoveredPosition === position;
+            const isSelected = selectedCard?.id === card.id && selectedPosition === position;
             const hoverOffsetX = isHovered ? 120 : 0;
             const hoverOffsetY = 0; // Убираем вертикальное движение
             const hoverOffsetZ = isHovered ? 50 : 0;
             
             const finalTransform = `translate3d(${diagonalX + hoverOffsetX}px, ${diagonalY + hoverOffsetY}px, ${diagonalZ + hoverOffsetZ}px) rotateY(${rotationY}deg)`;
             
+            // Определяем видимость карточки во время анимации
+            let cardOpacity = 1;
+            if (isExpanding || isFullscreen) {
+              cardOpacity = isSelected ? 0 : 0; // Скрываем все карточки во время анимации
+            }
+            
             visibleCards.push(
               <div
                 key={`card-${position}`}
-                className={`diagonal-card ${isHovered ? 'hovered' : ''}`}
+                className={`diagonal-card ${isHovered ? 'hovered' : ''} ${isSelected ? 'selected' : ''}`}
                 style={{
                   transform: finalTransform,
-                  opacity: 1,
+                  opacity: cardOpacity,
                   zIndex: isHovered ? 9999 : 1000 + position
                 }}
                 onMouseEnter={() => {
-                  setHoveredCard(card);
-                  setHoveredPosition(position);
+                  if (!isExpanding && !isFullscreen) {
+                    setHoveredCard(card);
+                    setHoveredPosition(position);
+                  }
                 }}
                 onMouseLeave={() => {
-                  setHoveredCard(null);
-                  setHoveredPosition(null);
+                  if (!isExpanding && !isFullscreen) {
+                    setHoveredCard(null);
+                    setHoveredPosition(null);
+                  }
                 }}
                 onMouseDown={(e) => e.stopPropagation()}
+                onClick={(e) => handleCardClick(card, position, e)}
               >
                 <img
                   src={card.src}
@@ -230,6 +275,48 @@ const DiagonalCardSlider: React.FC = () => {
       <div className="slider-footer">
         <h2 className="footer-title">Кейсы</h2>
       </div>
+
+      {/* Выбранная карточка для анимации */}
+      {selectedCard && selectedPosition !== null && (
+        <div className={`selected-card-overlay ${isExpanding ? 'expanding' : ''} ${isFullscreen ? 'fullscreen' : ''}`}>
+          <div className="selected-card-container">
+            <div 
+              className="selected-card"
+              style={{
+                backgroundImage: `url(${selectedCard.src})`,
+              }}
+            >
+              {isFullscreen && (
+                <div className="fullscreen-content">
+                  <button className="back-button" onClick={handleBackToSlider}>
+                    ← Назад к кейсам
+                  </button>
+                  <div className="fullscreen-info">
+                    <div className="fullscreen-category">Fintech</div>
+                    <h1 className="fullscreen-title">{selectedCard.title}</h1>
+                    <p className="fullscreen-description">{selectedCard.description}</p>
+                    <div className="fullscreen-details">
+                      <div className="detail-section">
+                        <h3>Технологии</h3>
+                        <div className="tech-tags">
+                          <span className="tech-tag">React</span>
+                          <span className="tech-tag">TypeScript</span>
+                          <span className="tech-tag">Node.js</span>
+                          <span className="tech-tag">PostgreSQL</span>
+                        </div>
+                      </div>
+                      <div className="detail-section">
+                        <h3>Результат</h3>
+                        <p>Увеличение конверсии на 45%, сокращение времени обработки заявок в 3 раза</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
