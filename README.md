@@ -20,22 +20,7 @@
 npm install
 ```
 
-2. Скопируйте изображения в public папку:
-
-**Вариант 1 - Автоматически (Windows):**
-```bash
-# Запустите bat файл
-copy-images.bat
-
-# или PowerShell скрипт
-.\copy-images.ps1
-```
-
-**Вариант 2 - Вручную:**
-- Создайте папку `public/imgCard/`
-- Скопируйте все PNG файлы из `imgCard/` в `public/imgCard/`
-
-3. Запустите проект:
+2. Запустите проект:
 ```bash
 npm start
 ```
