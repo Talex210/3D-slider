@@ -1,0 +1,159 @@
+/* Контейнер диагонального слайдера */
+.diagonal-slider-container {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  cursor: grab;
+  perspective: 3000px; /* Увеличиваем perspective для лучшего 3D эффекта */
+  perspective-origin: center center;
+  margin: 0 auto;
+}
+
+.diagonal-slider-container:active {
+  cursor: grabbing;
+}
+
+/* 3D сцена для карточек */
+.diagonal-slider-scene {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+}
+
+/* Диагональная карточка */
+.diagonal-card {
+  position: absolute;
+  width: 300px;
+  height: 400px;
+  transform-style: preserve-3d;
+  transition: transform 0.3s ease;
+  will-change: transform;
+  transform-origin: center center;
+}
+
+.diagonal-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 15px;
+  display: block;
+  box-shadow: 
+    0 20px 40px rgba(0, 0, 0, 0.4),
+    0 10px 20px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+  user-select: none;
+  pointer-events: none;
+}
+
+/* Hover эффекты отключены для стабильности */
+/* .diagonal-card:hover {
+  transform: translateY(-20px) rotateX(5deg) scale(1.05) !important;
+}
+
+.diagonal-card:hover img {
+  box-shadow: 
+    0 30px 60px rgba(0, 0, 0, 0.5),
+    0 15px 30px rgba(0, 0, 0, 0.3);
+} */
+
+/* Тень карточки */
+.card-shadow {
+  position: absolute;
+  bottom: -50px;
+  left: 20px;
+  right: 20px;
+  height: 30px;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(0, 0, 0, 0.4) 0%,
+    rgba(0, 0, 0, 0.2) 50%,
+    transparent 100%
+  );
+  border-radius: 50%;
+  filter: blur(15px);
+  transform: rotateX(90deg) translateZ(-15px);
+  transform-origin: center;
+}
+
+/* Эффект парения и боковая грань */
+.diagonal-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.1) 0%,
+    transparent 30%,
+    transparent 70%,
+    rgba(255, 255, 255, 0.05) 100%
+  );
+  border-radius: 15px;
+  pointer-events: none;
+}
+
+
+
+/* Убираем выделение текста */
+.diagonal-slider-container * {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+/* Плавная анимация появления */
+@keyframes diagonalAppear {
+  from {
+    opacity: 0;
+    transform: translate3d(-200px, 200px, -300px) rotateY(-45deg);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) rotateY(0deg);
+  }
+}
+
+.diagonal-slider-container {
+  animation: diagonalAppear 1s ease-out;
+}
+
+/* Эффект атмосферы */
+.diagonal-slider-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.1) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Диагональная направляющая линия (невидимая) */
+.diagonal-slider-container::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    135deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.02) 49%,
+    rgba(255, 255, 255, 0.02) 51%,
+    transparent 100%
+  );
+  pointer-events: none;
+  z-index: 2;
+}
